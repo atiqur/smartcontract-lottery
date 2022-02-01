@@ -7,14 +7,25 @@ contract Lottery {
     address payable[] public players;
     uint256 public usdEntryFee;
     AggregatorV3Interface internal ethUsdPriceFeed;
+    enum LOTTERY_STATE {
+        OPEN,
+        CLOSED,
+        CALCULATING_WINNER
+    }
+
+    // OPEN=0, CLOSED=1, CALCULATING_WINNER=2
+    LOTTERY_STATE public lottery_state;
 
     constructor(address _priceFeedAddress) public {
         usdEntryFee = 50 * (10**18);
         ethUsdPriceFeed = AggregatorV3Interface(_priceFeedAddress);
+        lottery_state = LOTTERY_STATE.CLOSED;
     }
 
     function entry() public payable {
         // $50 minimum
+        require(lottery_state == LOTTERY_STATE.OPEN);
+        require(msg.value >= getEntranceFee(), 'Not enough ETH');
         players.push(msg.sender);
     }
 
@@ -25,7 +36,13 @@ contract Lottery {
         return costToEnter;
     }
 
-    function startLottery() public {}
+    function startLottery() public {
+        require(
+            lottery_state == LOTTERY_STATE.CLOSED,
+            "Can't start a new lottery yet!"
+        );
+        lottery_state = LOTTERY_STATE.OPEN;
+    }
 
     function endLottert() public {}
 }
