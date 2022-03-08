@@ -36,7 +36,7 @@ contract Lottery is VRFConsumerBase, Ownable {
         keyhash = _keyhash;
     }
 
-    function entry() public payable {
+    function enter() public payable {
         // $50 minimum
         require(lottery_state == LOTTERY_STATE.OPEN);
         require(msg.value >= getEntranceFee(), 'Not enough ETH');
