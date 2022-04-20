@@ -61,6 +61,10 @@ contract Lottery is VRFConsumerBase, Ownable {
 
     function endLottery() public onlyOwner {
         lottery_state = LOTTERY_STATE.CALCULATING_WINNER;
+        require(
+            LINK.balanceOf(address(this)) >= fee,
+            'Not enough LINK - fill contract with faucet'
+        );
         bytes32 requestId = requestRandomness(keyhash, fee);
         emit RequestedRandomness(requestId);
     }
